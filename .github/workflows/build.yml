@@ -2,24 +2,23 @@ name: build
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: clone repo for Dockerfile
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: initalise submodules
-        run: git submodule update --init
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
 
-      - name: build debug apk
+      - name: Build debug APK
         run: docker build . --output .
 
-      - name: attach debug apk
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
