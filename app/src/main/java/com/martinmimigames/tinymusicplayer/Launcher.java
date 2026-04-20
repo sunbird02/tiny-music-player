@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -44,9 +45,11 @@ public class Launcher extends Activity {
         return;
       }
 
-      /* request a file from the system */
-      var intent = new Intent(Intent.ACTION_GET_CONTENT);
-      intent.setType("audio/*"); // intent type to filter application based on your requirement
+      /* request files from the system */
+      var intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+      intent.setType("audio/*");
+      intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+      intent.addCategory(Intent.CATEGORY_OPENABLE);
       startActivityForResult(intent, REQUEST_CODE);
       return;
     }
@@ -74,13 +77,13 @@ public class Launcher extends Activity {
   }
 
   /**
-   * call service control on receiving file
+   * call service control on receiving files
    */
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
     /* if result unusable, discard */
-    if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-      /* redirect to service */
+    if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK && intent != null) {
+      /* redirect to service with multiple files */
       intent.setAction(Intent.ACTION_VIEW);
       onIntent(intent);
       return;

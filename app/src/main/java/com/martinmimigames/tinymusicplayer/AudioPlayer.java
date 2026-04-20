@@ -42,6 +42,7 @@ class AudioPlayer extends Thread implements MediaPlayer.OnCompletionListener {
       );
     }
 
+    /* disable single-song looping, use playlist looping instead */
     mediaPlayer.setLooping(false);
 
     /* setup listeners for further logics */
@@ -83,7 +84,7 @@ class AudioPlayer extends Thread implements MediaPlayer.OnCompletionListener {
    * set player state
    *
    * @param playing is audio playing
-   * @param looping is audio looping
+   * @param looping is audio looping (single track loop)
    */
   void setState(boolean playing, boolean looping) {
     if (playing) {
@@ -91,15 +92,20 @@ class AudioPlayer extends Thread implements MediaPlayer.OnCompletionListener {
     } else {
       mediaPlayer.pause();
     }
+    /* looping parameter controls single-track loop, false means playlist loop */
     mediaPlayer.setLooping(looping);
   }
 
   /**
-   * release resource when playback finished
+   * release resource when playback finished, play next track if not in single-track loop mode
    */
   @Override
   public void onCompletion(MediaPlayer mp) {
-    service.stopSelf();
+    /* if single-track loop is enabled, don't advance to next track */
+    if (mediaPlayer.isLooping()) {
+      return;
+    }
+    service.playNextTrack();
   }
 
   /**
